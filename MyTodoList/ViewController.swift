@@ -11,8 +11,8 @@ import UIKit
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
-    
-    var todoList = [String]()
+
+    var todoList = [MyTodo]()
     
     @IBAction func tapAddButton(_ sender: Any) {
         let alertController = UIAlertController(title: "TODO追加", message: "TODOを入力してください", preferredStyle: UIAlertControllerStyle.alert)
@@ -23,9 +23,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             (action:UIAlertAction) in
             
             if let textField = alertController.textFields?.first {
-                self.todoList.insert(textField.text!, at: 0)
+                
+                let myTodo = MyTodo()
+                myTodo.todoTitle = textField.text!
+                self.todoList.insert(myTodo, at: 0)
                 
                 self.tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: UITableViewRowAnimation.right)
+                
+                let userDefaults = UserDefaults.standard
+                
+                let data = NSKeyedArchiver.archivedData(withRootObject: self.todoList)
+                userDefaults.set(data, forKey: "todoList")
+                userDefaults.synchronize()
             }
         }
         
@@ -41,6 +50,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let userDefaults = UserDefaults.standard
+        if let storedTodoList = userDefaults.object(forKey: "todoList") as? Data {
+            if let unarchiveTodoList = NSKeyedUnarchiver.unarchiveObject(with: storedTodoList) as? [MyTodo] {
+                todoList.append(contentsOf: unarchiveTodoList)
+            }
+        }
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -56,11 +73,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoCell", for: indexPath)
         
-        let todoTitle = todoList[indexPath.row]
+        let mytodo = todoList[indexPath.row]
         
-        cell.textLabel?.text = todoTitle
+        cell.textLabel?.text = mytodo.todoTitle
+        
+        if mytodo.todoDone {
+            cell.accessoryType = UITableViewCellAccessoryType.checkmark
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryType.none
+        }
         return cell
     }
-
+    
 }
 
