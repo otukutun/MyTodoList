@@ -85,5 +85,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let myTodo = todoList[indexPath.row]
+        if myTodo.todoDone {
+            myTodo.todoDone = false
+        } else {
+            myTodo.todoDone = true
+        }
+        
+        tableView.reloadRows(at: [indexPath], with: UITableViewRowAnimation.fade)
+        
+        let data: Data = NSKeyedArchiver.archivedData(withRootObject: todoList)
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(data, forKey: "todoList")
+        userDefaults.synchronize()
+    }
+    
 }
 

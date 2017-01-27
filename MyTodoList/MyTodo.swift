@@ -18,11 +18,11 @@ class MyTodo: NSObject, NSCoding {
     
     required init?(coder aDecoder: NSCoder) {
         todoTitle = aDecoder.decodeObject(forKey: "todoTitle") as? String
-        todoDone = aDecoder.decodeBool(forKey: "todoTitle")
+        todoDone = aDecoder.decodeBool(forKey: "todoDone")
     }
     
     func encode(with aCoder:NSCoder) {
         aCoder.encode(todoTitle, forKey: "todoTitle")
-        aCoder.encode(todoTitle, forKey: "todoDone")
+        aCoder.encode(todoDone, forKey: "todoDone")
     }
 }
